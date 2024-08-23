@@ -1,53 +1,52 @@
-import React, { useState } from 'react'
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert } from 'react-native'
-import Modal from 'react-native-modal'
-import { Button, ListItem } from 'react-native-elements'
-import { registerUser } from './api'
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, Modal } from 'react-native';
+import { registerUser } from '../utils/api';
 
-const Register = () => {
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [role, setRole] = useState('user')
-  const [isModalVisible, setIsModalVisible] = useState(false)
+const Register = ({navigation}) => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [role, setRole] = useState('select your role...');
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const roles = [
     { label: 'User', value: 'user' },
     { label: 'Driver', value: 'driver' },
-  ]
+  ];
 
   const handleRegister = async () => {
     if (!name || !email || !password) {
-      Alert.alert('Error', 'Please fill in all fields.')
-      return
+      Alert.alert('Error', 'Please fill in all fields.');
+      return;
     }
 
     if (!validateEmail(email)) {
-      Alert.alert('Error', 'Please enter a valid email address.')
-      return
+      Alert.alert('Error', 'Please enter a valid email address.');
+      return;
     }
 
     try {
-      await registerUser({ name, email, password, role })
-      Alert.alert('Registration Successful', `Registered as ${role}.`)
+      await registerUser({ name, email, password, role });
+      Alert.alert('Registration Successful', `Registered as ${role}.`);
+      navigation.navigate("LoginButtons")
     } catch (error) {
-      Alert.alert('Error', error.message || 'Error registering user')
+      Alert.alert('Error', error.message || 'Error registering user');
     }
-  }
+  };
 
   const validateEmail = (email) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return regex.test(email)
-  }
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
 
   const toggleModal = () => {
-    setIsModalVisible(!isModalVisible)
-  }
+    setIsModalVisible(!isModalVisible);
+  };
 
-  const selectRole = (role) => {
-    setRole(role)
-    toggleModal()
-  }
+  const selectRole = (selectedRole) => {
+    setRole(selectedRole);
+    toggleModal();
+  };
 
   return (
     <View style={styles.container}>
@@ -87,20 +86,29 @@ const Register = () => {
         <Text style={styles.buttonText}>Register</Text>
       </TouchableOpacity>
 
-      <Modal isVisible={isModalVisible} onBackdropPress={toggleModal}>
-        <View style={styles.modalContent}>
-          {roles.map((item, index) => (
-            <ListItem key={index} onPress={() => selectRole(item.value)}>
-              <ListItem.Content>
-                <ListItem.Title>{item.label}</ListItem.Title>
-              </ListItem.Content>
-            </ListItem>
-          ))}
+      <Modal
+        transparent={true}
+        visible={isModalVisible}
+        animationType="slide"
+        onRequestClose={toggleModal}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            {roles.map((item, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.modalItem}
+                onPress={() => selectRole(item.value)}
+              >
+                <Text style={styles.modalText}>{item.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
       </Modal>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -145,11 +153,27 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
   },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   modalContent: {
     backgroundColor: '#fff',
-    padding: 20,
+    width: 300,
     borderRadius: 5,
+    padding: 20,
   },
-})
+  modalItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  modalText: {
+    fontSize: 18,
+    textAlign: 'center',
+  },
+});
 
-export default Register
+export default Register;

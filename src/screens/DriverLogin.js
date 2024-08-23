@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert } from 'react-native'
 import React, { useState } from 'react'
 
-const Login = () => {
+const Login = ({navigation}) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -20,6 +20,7 @@ const Login = () => {
 
     setError('')
     Alert.alert('Login Successful', `Welcome, ${email}!`)
+    navigation.replace('HomeDriver'); 
    
   }
 

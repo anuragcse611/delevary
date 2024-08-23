@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert } from 'react-native'
-import { loginUser } from './api'
+import { loginUser } from '../utils/api'
 
-const Login = () => {
+const Login = ({navigation}) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
@@ -15,10 +15,8 @@ const Login = () => {
     try {
       const { token, user } = await loginUser({ email, password })
       Alert.alert('Login Successful', `Welcome back, ${user.name}.`)
-      // Save token and user details (e.g., in AsyncStorage or Context API)
-      // For example:
-      // await AsyncStorage.setItem('token', token)
-      // await AsyncStorage.setItem('user', JSON.stringify(user))
+      navigation.navigate('Home'); 
+     
     } catch (error) {
       Alert.alert('Error', error.message || 'Error logging in')
     }
