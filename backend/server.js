@@ -130,9 +130,9 @@ app.post('/create-order', async (req, res) => {
   }
 });
 
-
 app.post('/accept-order', async (req, res) => {
-  const { orderId } = req.body; 
+  const { orderId } = req.body;
+  console.log('orderId from backend', orderId, typeof orderId)
 
   if (!orderId) {
     return res.status(400).json({ error: 'Order ID is required' });
@@ -140,7 +140,11 @@ app.post('/accept-order', async (req, res) => {
 
   try {
    
-    const updatedOrder = await Delivery.findByIdAndUpdate(orderId, { status: 'accepted' }, { new: true });
+    const updatedOrder = await Delivery.findOneAndUpdate(
+      { orderId: orderId },  
+      { status: 'accepted' },
+      { new: true }
+    );
 
     if (!updatedOrder) {
       return res.status(404).json({ error: 'Order not found' });

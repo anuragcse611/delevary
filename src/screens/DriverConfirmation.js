@@ -37,7 +37,7 @@ const DriverConfirmation = ({ route }) => {
        
         <Text>Pickup: {pickupAddress}</Text>
         <Text>Drop-off: {dropAddress}</Text>
-        <Text>Truck: {truck.type}</Text>
+        
         <Text>Price: ${truck.price.toFixed(2)}</Text>
       </View>
     </View>

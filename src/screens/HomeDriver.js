@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Button, Alert, StyleSheet } from 'react-native';
-import { getActiveOrders, acceptOrder, rejectOrder } from '../utils/api';  
+import { getActiveOrders, acceptOrder, rejectOrder } from '../utils/api'; 
 
 const HomeDriver = ({navigation}) => {
   const [orders, setOrders] = useState([]);
@@ -15,10 +15,10 @@ const HomeDriver = ({navigation}) => {
       }
     };
 
-    
+  
     fetchOrders();
 
-    
+  
     const interval = setInterval(() => {
       fetchOrders();
     }, 30000);
@@ -27,6 +27,7 @@ const HomeDriver = ({navigation}) => {
   }, []);
 
   const handleAcceptOrder = async (orderId) => {
+    console.log('orderId from driver', orderId, typeof orderId)
     try {
       const acceptedOrder = orders.find(order => order.orderId === orderId);
       if (!acceptedOrder) {
@@ -34,21 +35,22 @@ const HomeDriver = ({navigation}) => {
         return;
       }
 
-      await acceptOrder(orderId); // Pass orderId directly
+      await acceptOrder(orderId); 
       setOrders(prevOrders => prevOrders.filter(order => order.orderId !== orderId));
+
       Alert.alert('Success', 'Order accepted successfully');
 
      
       navigation.navigate('DriverConfirmation', {
         pickupLocation: acceptedOrder.pickupLocation,
-        
+    
         pickupAddress: acceptedOrder.pickupAddress,
         dropAddress: acceptedOrder.dropAddress,
         truck: acceptedOrder.truck,
-        userName: acceptedOrder.userName, 
+         
       });
     } catch (error) {
-      console.error('Error accepting order:', error);
+      console.error('Error accepting order from driver:', error);
       Alert.alert('Error', 'Failed to accept the order');
     }
   };

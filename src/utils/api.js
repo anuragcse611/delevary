@@ -77,11 +77,13 @@ export const createOrder = async (orderData) => {
 
 
 export const acceptOrder = async (orderId) => {
+  console.log('orderId from api', orderId, typeof orderId)
   try {
+   
     const response = await axios.post(`${API_URL}/accept-order`, { orderId });
     return response.data;
   } catch (error) {
-    console.error('Error accepting order:', error.response?.data || error.message);
+    console.error('Error accepting order from api:', error.response?.data || error);
     throw error;
   }
 };
