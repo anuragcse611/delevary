@@ -1,26 +1,55 @@
-import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
-import { useRoute } from '@react-navigation/native'; // Import route hook
-import socket from '../utils/api'; // Import socket from api.js
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, Alert } from 'react-native';
+import { useRoute } from '@react-navigation/native';
+import { getActiveOrders, createOrder } from '../utils/api'; 
 
 const Confirmation = ({ navigation }) => {
   const route = useRoute();
-  const { truck, orderId } = route.params; // Get selected truck details from route params
+  const { orderData } = route.params;
+  const [orderAccepted, setOrderAccepted] = useState(false);
+
+  useEffect(() => {
+    const checkOrderStatus = async () => {
+      try {
+        const response = await getActiveOrders(orderData.orderId);
+        if (response && response.order && response.order.status === 'accepted') {
+          setOrderAccepted(true);
+        }
+      } catch (error) {
+        console.error('Error fetching order status:', error);
+        Alert.alert('Error', 'Failed to fetch order status.');
+      }
+    };
+
+   
+    const intervalId = setInterval(() => {
+      checkOrderStatus();
+    }, 5000); 
+
+    return () => clearInterval(intervalId); 
+  }, [orderData.orderId]);
 
   const handleTrackShipment = () => {
-    // Navigate to the Driver's map screen with the pickup and drop locations
-    navigation.navigate('', { orderId });
+    navigation.navigate('TrackShipment', { orderId: orderData.orderId });
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.greeting}>Thank you for your order!</Text>
-      <Text style={styles.details}>You have selected the {truck.type}</Text>
-      <Text style={styles.details}>Price: ${truck.price}</Text>
-      <Text>Your Order ID: {orderId}</Text>
-      <TouchableOpacity style={styles.trackButton} onPress={handleTrackShipment}>
-        <Text style={styles.trackButtonText}>Track Your Shipment</Text>
-      </TouchableOpacity>
+      <Text style={styles.details}>You have selected the {orderData.truck.type}</Text>
+      <Text style={styles.details}>Price: ${orderData.truck.price.toFixed(2)}</Text>
+      <Text style={styles.details}>Your Order ID: {orderData.orderId}</Text>
+      <Text style={styles.details}>Pickup: {orderData.pickupAddress}</Text>
+      <Text style={styles.details}>Drop-off: {orderData.dropAddress}</Text>
+      <Text style={styles.details}>Distance: {orderData.distance.toFixed(2)} km</Text>
+
+      {orderAccepted ? (
+        <TouchableOpacity style={styles.trackButton} onPress={handleTrackShipment}>
+          <Text style={styles.trackButtonText}>Track Shipment</Text>
+        </TouchableOpacity>
+      ) : (
+        <Text style={styles.waitingText}>Waiting for a driver to accept your order...</Text>
+      )}
     </View>
   );
 };
@@ -52,6 +81,11 @@ const styles = StyleSheet.create({
   trackButtonText: {
     color: '#fff',
     fontSize: 18,
+  },
+  waitingText: {
+    fontSize: 16,
+    color: '#666',
+    marginTop: 20,
   },
 });
 

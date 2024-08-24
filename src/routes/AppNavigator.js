@@ -10,11 +10,13 @@ import Register from '../screens/Register'
 import HomeDriver from '../screens/HomeDriver'
 import OrderConfirmed from '../screens/OrderConfirmed'
 import Confirmation from '../screens/Confirmation'
+import DriverMap from '../screens/DriverMap'
+import DriverConfirmation from '../screens/DriverConfirmation'
 
 const Stack = createNativeStackNavigator();
 const AppNavigator = () => {
   return (
-    <Stack.Navigator  initialRouteName = 'Home'  screenOptions={{headerShown: false}}>
+    <Stack.Navigator  initialRouteName = 'Splash'  screenOptions={{headerShown: false}}>
     <Stack.Screen name="Home" component={Home} />
     <Stack.Screen name="Splash" component={Splash} />
     <Stack.Screen name="LoginButtons" component={LoginButtons} />
@@ -24,6 +26,9 @@ const AppNavigator = () => {
     <Stack.Screen name="HomeDriver" component={HomeDriver} />
     <Stack.Screen name="OrderConfirmed" component={OrderConfirmed} />
     <Stack.Screen name="Confirmation" component={Confirmation} />
+    
+    
+    <Stack.Screen name="DriverConfirmation" component={DriverConfirmation} />
    
   </Stack.Navigator>
   )

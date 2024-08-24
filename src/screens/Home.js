@@ -3,6 +3,7 @@ import { StyleSheet, View, TextInput, TouchableOpacity, Text, Alert, Platform, P
 import MapView, { Marker } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
 import axios from 'axios';
+import { createOrder, createOrderList } from '../utils/api';
 
 const MapScreen = ({navigation}) => {
   const [currentLocation, setCurrentLocation] = useState({
@@ -107,13 +108,23 @@ const MapScreen = ({navigation}) => {
       }
     }
   };
-
   const handleConfirm = () => {
     if (pickupLocation && dropLocation) {
-      Alert.alert('Locations Confirmed', 'Pickup and drop-off locations have been set.');
-      navigation.navigate('OrderConfirmed')
+      const orderData = {
+        id: Date.now().toString(),
+        pickupLocation: pickupLocation,
+        dropLocation: dropLocation,
+        pickupAddress: pickupAddress,
+        dropAddress: dropAddress,
+      };
+      createOrder(orderData);
+      navigation.navigate('OrderConfirmed', {
+        pickupLocation,
+        dropLocation,
+        pickupAddress,
+        dropAddress
+      });
     } else {
-      console.log('error', error)
       Alert.alert('Error', 'Please set both pickup and drop-off locations.');
     }
   };

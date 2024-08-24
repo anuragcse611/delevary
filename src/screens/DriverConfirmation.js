@@ -3,78 +3,49 @@ import React, { useState, useEffect } from 'react'
 import { StyleSheet, View, PermissionsAndroid, Platform, Text } from 'react-native'
 import MapView, { Marker } from 'react-native-maps'
 
-const MapScreen = () => {
-  const [currentLocation, setCurrentLocation] = useState(null)
+const DriverConfirmation = ({ route }) => {
+  const { pickupLocation, pickupAddress, dropAddress, truck } = route.params;
 
-  useEffect(() => {
-    const requestLocationPermission = async () => {
-      if (Platform.OS === 'android') {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
-        )
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          getCurrentLocation()
-        }
-      } else {
-        getCurrentLocation()
-      }
-    }
-
-    const getCurrentLocation = () => {
-     try {
-      Geolocation.getCurrentPosition((position)=>{
-
-        setCurrentLocation({
-          latitude:position?.coords?.latitude,
-          longitude:position.coords.longitude,
-          latitudeDelta: 0.05,
-          longitudeDelta: 0.05,
-        })
-      });
-    
-     console.log('location', location)
+  console.log('Pickup Location:', pickupLocation);
+ 
 
   
-      
-     } catch (error) {
-      
-     }
-    }
-
-    requestLocationPermission()
-  }, [])
+  if (!pickupLocation ) {
+    return <Text>Error: Locations not available</Text>;
+  }
 
   return (
     <View style={styles.container}>
-      {currentLocation ? (
-        <MapView
-          style={styles.map}
-          initialRegion={currentLocation ?? {
-            latitude: 22.5726,
-            longitude: 88.3639,
-         
-          }}  // Set the initial region to the current location
-        >
-          {/* Marker for Current Location */}
-          <Marker
-            coordinate={{
-              latitude: currentLocation?.latitude ? currentLocation?.latitude : 22.5726 ,
-              longitude: currentLocation?.longitude ? currentLocation?.longitude : 88.3639,
-            }}
-            title="You are here"
-            pinColor="blue"
-          />
-        </MapView>
-      ) : (
-        <View style={styles.loadingContainer}>
-          <Text>Loading your location...</Text>
-        </View>
-      )}
+      <MapView
+        style={styles.map}
+        initialRegion={{
+          latitude: pickupLocation.latitude,
+          longitude: pickupLocation.longitude,
+          latitudeDelta: 0.1,
+          longitudeDelta: 0.1,
+        }}
+      >
+        <Marker
+          coordinate={{ latitude: pickupLocation.latitude, longitude: pickupLocation.longitude }}
+          title="Pickup Location"
+          description={pickupAddress}
+          pinColor="blue"
+        />
+        
+      </MapView>
+      <View style={styles.infoContainer}>
+       
+        <Text>Pickup: {pickupAddress}</Text>
+        <Text>Drop-off: {dropAddress}</Text>
+        <Text>Truck: {truck.type}</Text>
+        <Text>Price: ${truck.price.toFixed(2)}</Text>
+      </View>
     </View>
-  )
-}
+  );
+};
 
-export default MapScreen
+
+export default DriverConfirmation
 
 const styles = StyleSheet.create({
   container: {
@@ -87,5 +58,19 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  infoContainer: {
+    position: 'absolute',
+    bottom: 20,
+    left: 10,
+    right: 10,
+    backgroundColor: '#ffffff',
+    padding: 15,
+    borderRadius: 10,
+    elevation: 5, 
+    shadowColor: '#000000', 
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
 })

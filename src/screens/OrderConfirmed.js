@@ -1,29 +1,75 @@
-// OrderConfirmed.js
-import React from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native'; 
-import truckImage from '../assets/splash.png'; 
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import truckImage from '../assets/splash.png';
+import { createOrder } from '../utils/api'; 
+
 const OrderConfirmed = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+  const { pickupLocation, dropLocation, pickupAddress, dropAddress } = route.params;
+
+  const [distance, setDistance] = useState(0);
+  const [basePrice, setBasePrice] = useState(0);
+
+  useEffect(() => {
+    
+    const calculatedDistance = calculateDistance(pickupLocation, dropLocation);
+    setDistance(calculatedDistance);
+
+    
+    setBasePrice(calculatedDistance * 2); 
+  }, [pickupLocation, dropLocation]);
 
   const trucks = [
-    { type: 'Small Truck', price: 50, image: truckImage },
-    { type: 'Medium Truck', price: 100, image: truckImage },
-    { type: 'Large Truck', price: 150, image: truckImage },
-    { type: 'Extra Large Truck', price: 200, image: truckImage },
+    { type: 'Small Truck', priceMultiplier: 1, image: truckImage },
+    { type: 'Medium Truck', priceMultiplier: 1.5, image: truckImage },
+    { type: 'Large Truck', priceMultiplier: 2, image: truckImage },
+    { type: 'Extra Large Truck', priceMultiplier: 2.5, image: truckImage },
   ];
 
-  const handleTruckSelection = (truck) => {
-    navigation.navigate('Confirmation', { truck });
+  const handleTruckSelection = async (truck) => {
+    const finalPrice = basePrice * truck.priceMultiplier;
+    const orderData = {
+      pickupLocation,
+      dropLocation,
+      pickupAddress,
+      dropAddress,
+      distance,
+      truck: { 
+        type: truck.type,
+        price: finalPrice
+      },
+      orderId: "UBIRE" + (Math.random() * 12371826).toFixed().padEnd(8, '0')
+    };
+
+    try {
+      const response = await createOrder(orderData);
+      if (response && response.order) {
+        navigation.navigate('Confirmation', { orderData: response.order });
+      } else {
+        Alert.alert('Error', 'Failed to create the order. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error creating order:', error);
+      Alert.alert('Error', 'An unexpected error occurred. Please try again.');
+    }
+  };
+
+
+  const calculateDistance = (start, end) => {
+    const latDiff = Math.abs(start.latitude - end.latitude);
+    const lonDiff = Math.abs(start.longitude - end.longitude);
+    return Math.sqrt(latDiff * latDiff + lonDiff * lonDiff) * 111; 
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text style={styles.title}>Choose your Vehicle</Text>
-      <Text style={styles.details}>Pickup Location: [Your Pickup Location]</Text>
-      <Text style={styles.details}>Drop-off Location: [Your Drop-off Location]</Text>
-      <Text style={styles.details}>Total Distance: [Static Distance]</Text>
-      <Text style={styles.details}>Price: [Static Price]</Text>
+      <Text style={styles.details}>Pickup: {pickupAddress}</Text>
+      <Text style={styles.details}>Drop-off: {dropAddress}</Text>
+      <Text style={styles.details}>Total Distance: {distance.toFixed(2)} km</Text>
+      <Text style={styles.details}>Base Price: ${basePrice.toFixed(2)}</Text>
 
       <View style={styles.truckContainer}>
         {trucks.map((truck, index) => (
@@ -34,11 +80,13 @@ const OrderConfirmed = () => {
           >
             <Image source={truck.image} style={styles.truckImage} />
             <Text style={styles.truckType}>{truck.type}</Text>
-            <Text style={styles.truckPrice}>${truck.price}</Text>
+            <Text style={styles.truckPrice}>
+              ${(basePrice * truck.priceMultiplier).toFixed(2)}
+            </Text>
           </TouchableOpacity>
         ))}
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
