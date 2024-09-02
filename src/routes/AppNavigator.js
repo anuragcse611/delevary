@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
 import React from 'react'
 import Home from '../screens/Home'
 import Splash from '../screens/Splash'
@@ -12,8 +13,25 @@ import OrderConfirmed from '../screens/OrderConfirmed'
 import Confirmation from '../screens/Confirmation'
 import DriverMap from '../screens/DriverMap'
 import DriverConfirmation from '../screens/DriverConfirmation'
+import OrderHistory from '../screens/Driver/OrderHistory'
+import OrderStatus from '../screens/Driver/OrderStatus'
+import UserOrderStatus from '../screens/UserOrderStatus'
+import UserHistory from '../screens/UserHistory'
+import UserHomePage from '../screens/UserHomePage'
 
 const Stack = createNativeStackNavigator();
+
+
+// const HomeDriverDrawer = () => {
+//   return (
+//     <Drawer.Navigator initialRouteName="HomeDriver">
+//       <Drawer.Screen name="HomeDriver" component={HomeDriver} />
+//       <Drawer.Screen name="Order History" component={OrderHistory} />
+//       <Drawer.Screen name="Order Status" component={OrderStatus} />
+     
+//     </Drawer.Navigator>
+//   );
+// };
 const AppNavigator = () => {
   return (
     <Stack.Navigator  initialRouteName = 'Splash'  screenOptions={{headerShown: false}}>
@@ -26,6 +44,11 @@ const AppNavigator = () => {
     <Stack.Screen name="HomeDriver" component={HomeDriver} />
     <Stack.Screen name="OrderConfirmed" component={OrderConfirmed} />
     <Stack.Screen name="Confirmation" component={Confirmation} />
+    <Stack.Screen name="OrderHistory" component={OrderHistory} />
+    <Stack.Screen name="OrderStatus" component={OrderStatus} />
+    <Stack.Screen name="UserHistory" component={UserHistory} />
+    <Stack.Screen name="UserOrderStatus" component={UserOrderStatus} />
+    <Stack.Screen name="UserHomePage" component={UserHomePage} />
     
     
     <Stack.Screen name="DriverConfirmation" component={DriverConfirmation} />

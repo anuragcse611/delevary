@@ -63,6 +63,19 @@ export const loginUser = async (loginData) => {
   }
 };
 
+export const logoutUser = async () => {
+  try {
+    const response = await axios.post(`${API_URL}/logout`, {}, { withCredentials: true });
+    return response.data;
+  } catch (error) {
+    console.error('Error in logoutUser:', error);
+    if (error.response && error.response.data) {
+      throw error.response.data;
+    } else {
+      throw new Error('Network error or server did not respond');
+    }
+  }
+};
 
 
 export const createOrder = async (orderData) => {
@@ -117,3 +130,44 @@ export const getActiveOrders = async () => {
     throw error; 
   }
 };
+
+export const getOrderHistory = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/order-history`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching order history:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const getAcceptedOrders = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/accepted-orders`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching accepted orders:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const getUserProfile = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/profile`, { withCredentials: true });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching user profile:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const changePassword = async (oldPassword, newPassword) => {
+  try {
+    const response = await axios.post(`${API_URL}/change-password`, { oldPassword, newPassword }, { withCredentials: true });
+    return response.data;
+  } catch (error) {
+    console.error('Error changing password:', error.response?.data || error.message);
+    throw error;
+  }
+};
+

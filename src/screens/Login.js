@@ -15,7 +15,7 @@ const Login = ({navigation}) => {
     try {
       const { token, user } = await loginUser({ email, password })
       Alert.alert('Login Successful', `Welcome back, ${user.name}.`)
-      navigation.navigate('Home'); 
+      navigation.navigate('UserHomePage'); 
      
     } catch (error) {
       Alert.alert('Error', error.message || 'Error logging in')
